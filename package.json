@@ -83,18 +83,5 @@
   "engines": {
     "node": ">=20.18.1",
     "pnpm": "^9 || ^10 || ^11"
-  },
-  "pnpm": {
-    "overrides": {
-      "@babel/helpers": "7.29.7",
-      "@babel/runtime": "7.29.7",
-      "@babel/traverse": "7.29.7",
-      "rollup": "4.64.0"
-    },
-    "onlyBuiltDependencies": [
-      "sharp",
-      "esbuild",
-      "unrs-resolver"
-    ]
   }
 }
