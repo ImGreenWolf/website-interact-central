@@ -51,10 +51,10 @@ async function verifyAttendance() {
       headers: await getPayloadAuthHeaders(),
     })
   if(!auth.user)
-    return {message: 'please log in'}
+    return {message: 'Trebuie sa te loghezi in contrul tau'}
 
   if(!meeting)
-    return {message: 'no meeting'}
+    return {message: 'Nu exista nicio sedinta activa'}
 
   const existingAttendance = (await payload.find({
     collection: 'attendances',
@@ -75,7 +75,7 @@ async function verifyAttendance() {
   })).docs[0]
 
   if(existingAttendance)
-    return {message: 'already present', meeting: meeting}
+    return {message: 'Esti deja prezent pentru aceasta sedinta', meeting: meeting}
   
   const attendance = await payload.create({
     collection: 'attendances',
@@ -86,7 +86,7 @@ async function verifyAttendance() {
     overrideAccess: true,
   })
   if(attendance)
-    return {message: 'presence marked', meeting: meeting}
+    return {message: 'Marcat ca prezent', meeting: meeting}
   else
     return {message: 'presence marking failed', meeting: meeting}
 
