@@ -11,6 +11,7 @@ export const Attendances: CollectionConfig = {
     read: boardOrOwnAttendance,
     update: board,
   },
+  indexes: [{fields: ['user', 'meeting'], unique: true}],
   admin: {
     useAsTitle: 'user',
     components: {

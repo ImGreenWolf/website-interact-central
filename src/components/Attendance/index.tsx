@@ -7,6 +7,10 @@ import { QRCode } from 'react-qr-code'
 
 import payloadConfig from '@payload-config'
 import { getPayloadAuthHeaders } from '@/utilities/payloadAuth'
+import getUserLocation from '../Checkin/locationManager'
+import { Meeting } from '@/payload-types'
+import ClientDisplay from './ClientDisplay'
+import { updateMeetingLocation } from './actions'
 
 export default async function MyCustomView(props: AdminViewServerProps) {
    const payload = await getPayload({
@@ -32,16 +36,18 @@ export default async function MyCustomView(props: AdminViewServerProps) {
 
   if(!meeting)
     return;
-  const attendance = await payload.create({
-    collection: 'attendances',
-    data: {
-      meeting: meeting,
-      user: auth.user,
-    },
-    overrideAccess: true,
-  })
+  // const attendance = await payload.create({
+  //   collection: 'attendances',
+  //   data: {
+  //     meeting: meeting,
+  //     user: auth.user,
+  //   },
+  //   overrideAccess: true,
+  // })
 
-  const checkinLink = `${process.env.NEXT_PUBLIC_SERVER_URL}/checkin?meeting=${meeting?.id}`
+  
+
+  const checkinLink = `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/collections/meetings/checkin?meeting=${meeting?.id}`
   return (
     <Gutter>
       <h1>Scanare Prezenta</h1>
@@ -53,9 +59,9 @@ export default async function MyCustomView(props: AdminViewServerProps) {
           value={checkinLink}
           />
         }
-        {/* <a href="checkinLink">{checkinLink}</a> */}
+        <a href={checkinLink}>{checkinLink}</a>
       </div>
-      
+      <ClientDisplay meeting={meeting} setUserLocation={updateMeetingLocation}/>
       
     </Gutter>
   )

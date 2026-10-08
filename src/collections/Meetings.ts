@@ -46,6 +46,10 @@ export const Meetings: CollectionConfig = {
       collection: 'attendances',
       on: 'meeting',
       hasMany: true
+    },
+    {
+      name: 'location',
+      type: 'json',
     }
   ],
   timestamps: true,

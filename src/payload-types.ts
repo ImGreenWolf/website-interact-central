@@ -479,6 +479,15 @@ export interface Meeting {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
+  location?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1408,6 +1417,7 @@ export interface UsersSelect<T extends boolean = true> {
 export interface MeetingsSelect<T extends boolean = true> {
   meetingDate?: T;
   attendance?: T;
+  location?: T;
   updatedAt?: T;
   createdAt?: T;
 }
