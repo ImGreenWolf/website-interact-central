@@ -19,6 +19,7 @@ import { HorizontalRuleFeatureClient as HorizontalRuleFeatureClient_e70f5e05f09f
 import { BlocksFeatureClient as BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864 } from '@payloadcms/richtext-lexical/client'
 import { FolderTableCell as FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 import { FolderField as FolderField_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { BulkImportExportBeforeList as BulkImportExportBeforeList_ec74008ba1b25e45ee9d0d5971863de7 } from '@interact2241/payload-plugin-bulk-import-export/rsc'
 import { default as default_65e176f1196f640a43838376230a338d } from '@/components/Checkin'
 import { AttendanceDisplayRouteButton as AttendanceDisplayRouteButton_7af3181917748145f5233790fe73cf50 } from '@/components/Attendance/DisplayRouteButton'
 import { default as default_b78b529d0f19a00b22084e1e58d61e34 } from '@/components/Attendance/DisplayView'
@@ -54,6 +55,7 @@ export const importMap = {
   "@payloadcms/richtext-lexical/client#BlocksFeatureClient": BlocksFeatureClient_e70f5e05f09f93e00b997edb1ef0c864,
   "@payloadcms/next/rsc#FolderTableCell": FolderTableCell_f9c02e79a4aed9a3924487c0cd4cafb1,
   "@payloadcms/next/rsc#FolderField": FolderField_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@interact2241/payload-plugin-bulk-import-export/rsc#BulkImportExportBeforeList": BulkImportExportBeforeList_ec74008ba1b25e45ee9d0d5971863de7,
   "@/components/Checkin#default": default_65e176f1196f640a43838376230a338d,
   "@/components/Attendance/DisplayRouteButton#AttendanceDisplayRouteButton": AttendanceDisplayRouteButton_7af3181917748145f5233790fe73cf50,
   "@/components/Attendance/DisplayView#default": default_b78b529d0f19a00b22084e1e58d61e34,

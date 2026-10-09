@@ -13,6 +13,7 @@ import { board, boardAdminAccess, boardAdminHidden } from '@/access/roles'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { bulkImportExportPlugin } from '@interact2241/payload-plugin-bulk-import-export'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
@@ -128,5 +129,8 @@ export const plugins: Plugin[] = [
         return [...defaultFields, ...searchFields]
       },
     },
+  }),
+  bulkImportExportPlugin({
+    collections: ['users', 'attendances', 'meetings', 'mandates'],
   }),
 ]

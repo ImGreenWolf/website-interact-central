@@ -17,6 +17,9 @@ importers:
 
   .:
     dependencies:
+      '@interact2241/payload-plugin-bulk-import-export':
+        specifier: workspace:*
+        version: link:packages/payload-plugin-bulk-import-export
       '@payloadcms/admin-bar':
         specifier: 3.90.2
         version: 3.90.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -95,6 +98,9 @@ importers:
       prism-react-renderer:
         specifier: ^2.4.1
         version: 2.4.1(react@19.2.6)
+      qs-esm:
+        specifier: ^8.0.2
+        version: 8.0.2
       react:
         specifier: 19.2.6
         version: 19.2.6
@@ -183,6 +189,24 @@ importers:
       vitest:
         specifier: 4.0.18
         version: 4.0.18(@types/node@22.19.9)(happy-dom@20.14.5)(jiti@2.7.0)(jsdom@28.0.0)(lightningcss@1.32.0)(sass@1.77.4)(tsx@4.23.15)
+
+  packages/payload-plugin-bulk-import-export:
+    dependencies:
+      '@payloadcms/ui':
+        specifier: ^3.0.0
+        version: 3.90.2(@types/react@19.2.14)(monaco-editor@0.57.0)(next@16.3.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.90.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
+      payload:
+        specifier: ^3.0.0
+        version: 3.90.2(graphql@16.14.2)(typescript@5.7.3)
+      qs-esm:
+        specifier: 8.0.1
+        version: 8.0.1
+      react:
+        specifier: ^19.0.0
+        version: 19.2.6
+      react-dom:
+        specifier: ^19.0.0
+        version: 19.2.6(react@19.2.6)
 
 packages:
 
@@ -3803,6 +3827,10 @@ packages:
 
   qs-esm@8.0.1:
     resolution: {integrity: sha512-eZ7l+0ZVy3He9c85pEM9KEBR9DFA4jrmWvIjm9wpcHvScwc/vgZDl2TNOF0pm0JsWKw24XBUZOY0Wxn7/nvJnw==}
+    engines: {node: '>=18'}
+
+  qs-esm@8.0.2:
+    resolution: {integrity: sha512-1usFLrE/VS+23TxRpOJvELzt67e4LqbrtjvQSlsnIX0vQta1QCucxa0hcUdPiOWA5SvBLK/0JwKYHH5h7lEnVQ==}
     engines: {node: '>=18'}
 
   queue-microtask@1.2.3:
@@ -8562,6 +8590,8 @@ snapshots:
   qrcode-generator@2.0.4: {}
 
   qs-esm@8.0.1: {}
+
+  qs-esm@8.0.2: {}
 
   queue-microtask@1.2.3: {}
 

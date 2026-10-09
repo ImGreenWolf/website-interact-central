@@ -1,0 +1,33 @@
+{
+  "name": "@interact2241/payload-plugin-bulk-import-export",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "types": "./src/index.ts"
+    },
+    "./client": {
+      "import": "./src/exports/client.ts",
+      "types": "./src/exports/client.ts"
+    },
+    "./rsc": {
+      "import": "./src/exports/rsc.tsx",
+      "types": "./src/exports/rsc.tsx"
+    },
+    "./types": {
+      "import": "./src/types.ts",
+      "types": "./src/types.ts"
+    }
+  },
+  "dependencies": {
+    "qs-esm": "8.0.1"
+  },
+  "peerDependencies": {
+    "@payloadcms/ui": "^3.0.0",
+    "payload": "^3.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  }
+}
