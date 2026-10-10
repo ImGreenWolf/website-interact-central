@@ -129,6 +129,11 @@ export interface Config {
   };
   locale: null;
   widgets: {
+    'member-presence-statistics': MemberPresenceStatisticsWidget;
+    'member-presence-graph': MemberPresenceGraphWidget;
+    'meetings-management': MeetingsManagementWidget;
+    'last-meeting-statistic': LastMeetingStatisticWidget;
+    'intro-widget': IntroWidgetWidget;
     collections: CollectionsWidget;
   };
   user: User;
@@ -435,7 +440,22 @@ export interface User {
     hasNextPage?: boolean;
     totalDocs?: number;
   };
-  role?: ('active' | 'board') | null;
+  role?:
+    | (
+        | 'Membru Activ'
+        | 'Membru Pasiv'
+        | 'Președinte'
+        | 'Vicepreședinte'
+        | 'Secretar'
+        | 'Trezorier'
+        | 'PM Director'
+        | 'PR Director'
+        | 'IR Director'
+        | 'HR Director'
+        | 'Past-President'
+      )
+    | null;
+  joinedAt: string;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1392,6 +1412,7 @@ export interface UsersSelect<T extends boolean = true> {
   name?: T;
   attendance?: T;
   role?: T;
+  joinedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1809,6 +1830,56 @@ export interface FooterSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "member-presence-statistics_widget".
+ */
+export interface MemberPresenceStatisticsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "member-presence-graph_widget".
+ */
+export interface MemberPresenceGraphWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "meetings-management_widget".
+ */
+export interface MeetingsManagementWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "last-meeting-statistic_widget".
+ */
+export interface LastMeetingStatisticWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "intro-widget_widget".
+ */
+export interface IntroWidgetWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'x-small' | 'small' | 'medium' | 'large' | 'x-large' | 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

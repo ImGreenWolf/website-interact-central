@@ -21,6 +21,7 @@ export type ImportableField = {
   path: string
   relationTo?: string
   required: boolean
+  requiredOnCreate?: boolean
   type: BulkUploadFieldType
 }
 
@@ -56,9 +57,7 @@ const supportedTypes = new Set<string>([
 
 const identityFieldOrder = ['id', 'slug', 'email', 'title', 'name', 'year']
 
-export function getCollectionUploadSchema(
-  collection: CollectionConfig,
-): CollectionUploadSchema {
+export function getCollectionUploadSchema(collection: CollectionConfig): CollectionUploadSchema {
   const fields: ImportableField[] = []
   const skippedRequiredFields: SkippedRequiredField[] = []
 
@@ -70,15 +69,24 @@ export function getCollectionUploadSchema(
     skippedRequiredFields,
   })
 
-  if (
-    collection.slug === 'users' &&
-    !fields.some((field) => field.path === 'password')
-  ) {
+  if (collection.auth && !fields.some((field) => field.path === 'email')) {
+    fields.push({
+      hasMany: false,
+      label: 'Email',
+      path: 'email',
+      required: false,
+      requiredOnCreate: true,
+      type: 'email',
+    })
+  }
+
+  if (collection.auth && !fields.some((field) => field.path === 'password')) {
     fields.push({
       hasMany: false,
       label: 'Password',
       path: 'password',
-      required: true,
+      required: false,
+      requiredOnCreate: true,
       type: 'text',
     })
   }
@@ -105,13 +113,9 @@ export function suggestMappings(headers: string[], fields: ImportableField[]) {
   return mapping
 }
 
-export function getDefaultMatchSelection(
-  headers: string[],
-  matchFieldOptions: MatchFieldOption[],
-) {
+export function getDefaultMatchSelection(headers: string[], matchFieldOptions: MatchFieldOption[]) {
   const sorted = [...matchFieldOptions].sort(
-    (a, b) =>
-      identityFieldOrder.indexOf(a.path) - identityFieldOrder.indexOf(b.path),
+    (a, b) => identityFieldOrder.indexOf(a.path) - identityFieldOrder.indexOf(b.path),
   )
   const field =
     sorted.find((option) => findHeader(headers, option.path)) ??
@@ -125,10 +129,7 @@ export function getDefaultMatchSelection(
   }
 }
 
-export function getCollectionBySlug(
-  collections: CollectionConfig[],
-  slug: string,
-) {
+export function getCollectionBySlug(collections: CollectionConfig[], slug: string) {
   return collections.find((collection) => collection.slug === slug)
 }
 
@@ -154,15 +155,9 @@ function collectFields(args: {
         const tabRecord = tab as Record<string, unknown>
         const tabName = typeof tabRecord.name === 'string' ? tabRecord.name : ''
         const tabLabel = getLabel(tabRecord.label, tabName)
-        const nextPathPrefix = tabName
-          ? joinPath(args.pathPrefix, tabName)
-          : args.pathPrefix
-        const nextLabelPrefix = tabLabel
-          ? [...args.labelPrefix, tabLabel]
-          : args.labelPrefix
-        const tabFields = Array.isArray(tabRecord.fields)
-          ? (tabRecord.fields as Field[])
-          : []
+        const nextPathPrefix = tabName ? joinPath(args.pathPrefix, tabName) : args.pathPrefix
+        const nextLabelPrefix = tabLabel ? [...args.labelPrefix, tabLabel] : args.labelPrefix
+        const tabFields = Array.isArray(tabRecord.fields) ? (tabRecord.fields as Field[]) : []
 
         collectFields({
           ...args,
@@ -175,9 +170,7 @@ function collectFields(args: {
     }
 
     if (type === 'row' || type === 'collapsible') {
-      const nestedFields = Array.isArray(fieldRecord.fields)
-        ? (fieldRecord.fields as Field[])
-        : []
+      const nestedFields = Array.isArray(fieldRecord.fields) ? (fieldRecord.fields as Field[]) : []
 
       collectFields({
         ...args,
@@ -189,17 +182,13 @@ function collectFields(args: {
     const name = typeof fieldRecord.name === 'string' ? fieldRecord.name : ''
 
     if (type === 'group') {
-      const nestedFields = Array.isArray(fieldRecord.fields)
-        ? (fieldRecord.fields as Field[])
-        : []
+      const nestedFields = Array.isArray(fieldRecord.fields) ? (fieldRecord.fields as Field[]) : []
       const groupLabel = getLabel(fieldRecord.label, name)
 
       collectFields({
         ...args,
         fields: nestedFields,
-        labelPrefix: groupLabel
-          ? [...args.labelPrefix, groupLabel]
-          : args.labelPrefix,
+        labelPrefix: groupLabel ? [...args.labelPrefix, groupLabel] : args.labelPrefix,
         pathPrefix: name ? joinPath(args.pathPrefix, name) : args.pathPrefix,
       })
       return
@@ -208,10 +197,7 @@ function collectFields(args: {
     if (!name) return
 
     const path = joinPath(args.pathPrefix, name)
-    const label = [
-      ...args.labelPrefix,
-      getLabel(fieldRecord.label, name) || name,
-    ].join(' / ')
+    const label = [...args.labelPrefix, getLabel(fieldRecord.label, name) || name].join(' / ')
 
     if (isBlockedField(fieldRecord)) return
 
@@ -244,13 +230,10 @@ function collectFields(args: {
       defaultValue: fieldRecord.defaultValue,
       hasMany: Boolean(fieldRecord.hasMany),
       label,
-      options:
-        type === 'select' ? getSelectOptions(fieldRecord.options) : undefined,
+      options: type === 'select' ? getSelectOptions(fieldRecord.options) : undefined,
       path,
       relationTo:
-        type === 'relationship' || type === 'upload'
-          ? String(fieldRecord.relationTo)
-          : undefined,
+        type === 'relationship' || type === 'upload' ? String(fieldRecord.relationTo) : undefined,
       required: Boolean(fieldRecord.required),
       type: type as BulkUploadFieldType,
     })
@@ -288,21 +271,14 @@ function getMatchFieldOptions(
   })
 
   return dedupeByPath(options).sort(
-    (a, b) =>
-      getIdentityOrder(a.path) - getIdentityOrder(b.path) ||
-      a.label.localeCompare(b.label),
+    (a, b) => getIdentityOrder(a.path) - getIdentityOrder(b.path) || a.label.localeCompare(b.label),
   )
 }
 
 function getFieldHeaderCandidates(field: ImportableField) {
   const finalSegment = field.path.split('.').at(-1) ?? field.path
 
-  return [
-    field.path,
-    field.label,
-    finalSegment,
-    finalSegment.replace(/([a-z])([A-Z])/g, '$1 $2'),
-  ]
+  return [field.path, field.label, finalSegment, finalSegment.replace(/([a-z])([A-Z])/g, '$1 $2')]
 }
 
 function getIdentityOrder(path: string) {
@@ -321,9 +297,7 @@ function dedupeByPath(options: MatchFieldOption[]) {
   })
 }
 
-function getSelectOptions(
-  options: unknown,
-): { label: string; value: string }[] {
+function getSelectOptions(options: unknown): { label: string; value: string }[] {
   if (!Array.isArray(options)) return []
 
   return options
@@ -337,16 +311,12 @@ function getSelectOptions(
 
       return value ? { label, value } : null
     })
-    .filter((option): option is { label: string; value: string } =>
-      Boolean(option),
-    )
+    .filter((option): option is { label: string; value: string } => Boolean(option))
 }
 
 function isBlockedField(field: Record<string, unknown>) {
   const admin =
-    field.admin && typeof field.admin === 'object'
-      ? (field.admin as Record<string, unknown>)
-      : {}
+    field.admin && typeof field.admin === 'object' ? (field.admin as Record<string, unknown>) : {}
   const access =
     field.access && typeof field.access === 'object'
       ? (field.access as Record<string, unknown>)
@@ -384,7 +354,5 @@ function joinPath(prefix: string, name: string) {
 export function hasHeader(headers: string[], header: string) {
   const normalizedHeader = normalizeColumnName(header)
 
-  return headers.some(
-    (candidate) => normalizeColumnName(candidate) === normalizedHeader,
-  )
+  return headers.some((candidate) => normalizeColumnName(candidate) === normalizedHeader)
 }

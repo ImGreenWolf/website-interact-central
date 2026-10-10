@@ -92,10 +92,7 @@ export async function inspectBulkUpload(args: {
   }
 
   const schema = getCollectionUploadSchema(collection)
-  const defaultMatch = getDefaultMatchSelection(
-    parsed.parsed.headers,
-    schema.matchFieldOptions,
-  )
+  const defaultMatch = getDefaultMatchSelection(parsed.parsed.headers, schema.matchFieldOptions)
 
   return {
     ...schema,
@@ -107,10 +104,7 @@ export async function inspectBulkUpload(args: {
       .slice(0, 5)
       .map((row) =>
         Object.fromEntries(
-          parsed.parsed!.headers.map((header, index) => [
-            header,
-            row.cells[index] ?? '',
-          ]),
+          parsed.parsed!.headers.map((header, index) => [header, row.cells[index] ?? '']),
         ),
       ),
     suggestedMapping: suggestMappings(parsed.parsed.headers, schema.fields),
@@ -279,9 +273,7 @@ async function prepareRows(args: {
   const preparedRows: PreparedRow[] = []
   const uploadResolverCache: UploadResolverCache = new Map()
   const rowNumberFilter =
-    args.rowNumbers && args.rowNumbers.length > 0
-      ? new Set(args.rowNumbers)
-      : null
+    args.rowNumbers && args.rowNumbers.length > 0 ? new Set(args.rowNumbers) : null
 
   for (const row of parsed.parsed.rows) {
     if (rowNumberFilter && !rowNumberFilter.has(row.rowNumber)) continue
@@ -419,9 +411,7 @@ async function coerceValue(args: {
 
   if (
     field.hasMany &&
-    (field.type === 'relationship' ||
-      field.type === 'select' ||
-      field.type === 'upload')
+    (field.type === 'relationship' || field.type === 'select' || field.type === 'upload')
   ) {
     const values = splitMany(value)
     const resolvedValues: unknown[] = []
@@ -634,9 +624,7 @@ async function resolveRelatedID(args: {
   const collection = args.payload.config?.collections
     ? getCollectionBySlug(args.payload.config.collections, args.collectionSlug)
     : undefined
-  const relatedSchema = collection
-    ? getCollectionUploadSchema(collection)
-    : undefined
+  const relatedSchema = collection ? getCollectionUploadSchema(collection) : undefined
   const lookupFields = getLookupFields(relatedSchema)
   const where = {
     or: lookupFields.map((field) => ({
@@ -735,7 +723,7 @@ function validateRequiredFields(args: {
   skippedRequiredFields: { label: string; path: string; type: string }[]
 }) {
   args.fields.forEach((field) => {
-    if (!field.required || field.defaultValue !== undefined) return
+    if ((!field.required && !field.requiredOnCreate) || field.defaultValue !== undefined) return
 
     const value = getDeepValue(args.data, field.path)
     const missing = value === undefined || value === null || value === ''
@@ -767,9 +755,7 @@ function findDuplicateMatchRows(args: {
   const duplicates = new Map<number, number>()
 
   args.rows.forEach((row) => {
-    const value = getCell(row, args.headers, args.matchColumn)
-      .trim()
-      .toLocaleLowerCase('ro')
+    const value = getCell(row, args.headers, args.matchColumn).trim().toLocaleLowerCase('ro')
 
     if (!value) return
 
@@ -794,10 +780,8 @@ function getPlannedOperation(mode: BulkUploadMode, hasExisting: boolean) {
 }
 
 function getSkippedReason(mode: BulkUploadMode, hasExisting: boolean) {
-  if (mode === 'create' && hasExisting)
-    return 'A matching document already exists.'
-  if (mode === 'update' && !hasExisting)
-    return 'No matching document was found.'
+  if (mode === 'create' && hasExisting) return 'A matching document already exists.'
+  if (mode === 'update' && !hasExisting) return 'No matching document was found.'
 
   return undefined
 }
@@ -834,9 +818,7 @@ function getMatchField(options: MatchFieldOption[], path: string) {
   return matchField
 }
 
-function getLookupFields(
-  schema: CollectionUploadSchema | undefined,
-): MatchFieldOption[] {
+function getLookupFields(schema: CollectionUploadSchema | undefined): MatchFieldOption[] {
   if (!schema) return [{ label: 'ID', path: 'id', type: 'id' }]
 
   return schema.matchFieldOptions.length > 0
@@ -869,11 +851,7 @@ function splitMany(value: string) {
     .filter(Boolean)
 }
 
-function setDeepValue(
-  target: Record<string, unknown>,
-  path: string,
-  value: unknown,
-) {
+function setDeepValue(target: Record<string, unknown>, path: string, value: unknown) {
   const parts = path.split('.')
   let current = target
 
@@ -895,8 +873,7 @@ function setDeepValue(
 
 function getDeepValue(target: Record<string, unknown>, path: string) {
   return path.split('.').reduce<unknown>((current, part) => {
-    if (!current || typeof current !== 'object' || Array.isArray(current))
-      return undefined
+    if (!current || typeof current !== 'object' || Array.isArray(current)) return undefined
 
     return (current as Record<string, unknown>)[part]
   }, target)

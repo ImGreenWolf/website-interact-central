@@ -1,22 +1,31 @@
+import { User } from '@/payload-types'
 import type { Access, ClientUser, FieldAccess, PayloadRequest } from 'payload'
 
-type MemberRole = 'active' | 'board'
 type UserWithRole = {
   id?: number | string
-  role?: MemberRole | null
+  role?: User['role'] | null
 }
 
-const getRole = (user: UserWithRole | null | undefined): MemberRole | undefined => {
+const getRole = (user: UserWithRole | null | undefined): User['role'] | undefined => {
   const role = user?.role
 
-  return role === 'active' || role === 'board' ? role : undefined
+  return role
 }
 
 export const isBoardMember = (user: UserWithRole | null | undefined): boolean =>
-  getRole(user) === 'board'
+  (user && getRole(user) )? [ 'Președinte',
+        'Vicepreședinte',
+        'Secretar',
+        'Trezorier',
+        'PM Director',
+        'PR Director',
+        'IR Director',
+        'HR Director',
+        'board',
+        'Past-President'].includes(getRole(user)!) : false
 
 export const isActiveMember = (user: UserWithRole | null | undefined): boolean =>
-  getRole(user) === 'active'
+  getRole(user) === 'Membru Activ'
 
 export const board: Access = ({ req: { user } }) => isBoardMember(user)
 

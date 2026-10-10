@@ -17,6 +17,7 @@ type ImportableField = {
   path: string
   relationTo?: string
   required: boolean
+  requiredOnCreate?: boolean
   type: string
 }
 
@@ -34,6 +35,14 @@ type ExportJoinSubfield = {
   label: string
   path: string
   type: string
+}
+
+type ExportTransposeConfig = {
+  columnBy: string
+  columnHeaderField: string
+  enabled: boolean
+  groupBy: string
+  valueField: string
 }
 
 type MatchFieldOption = {
@@ -119,6 +128,14 @@ export default function BulkImportExportBeforeListClient(props: { endpointBase?:
     () => getExportJoinFields(config.collections, collection),
     [collection, config.collections],
   )
+  const exportFieldOptions = useMemo(
+    () => getExportFieldOptions(config.collections, collection),
+    [collection, config.collections],
+  )
+  const defaultTransposeExport = useMemo(
+    () => getDefaultTransposeConfig(collection, exportJoinFields),
+    [collection, exportJoinFields],
+  )
   const [file, setFile] = useState<File | null>(null)
   const [inspectResult, setInspectResult] = useState<InspectResult | null>(null)
   const [mapping, setMapping] = useState<Record<string, string>>({})
@@ -128,6 +145,8 @@ export default function BulkImportExportBeforeListClient(props: { endpointBase?:
   const [selectedExportJoinFields, setSelectedExportJoinFields] = useState<
     Record<string, string[]>
   >({})
+  const [transposeExport, setTransposeExport] =
+    useState<ExportTransposeConfig>(defaultTransposeExport)
   const [previewResult, setPreviewResult] = useState<PreviewResult | null>(null)
   const [importResult, setImportResult] = useState<ImportResult | null>(null)
   const [requestState, setRequestState] = useState<RequestState | null>(null)
@@ -135,6 +154,16 @@ export default function BulkImportExportBeforeListClient(props: { endpointBase?:
   const [isImportOpen, setIsImportOpen] = useState(false)
   const [isExportOpen, setIsExportOpen] = useState(false)
   const [portalTarget, setPortalTarget] = useState<HTMLElement | null>(null)
+  const transposeColumnHeaderFields = useMemo(() => {
+    return exportJoinFields.find((field) => field.path === transposeExport.columnBy)?.fields || []
+  }, [exportJoinFields, transposeExport.columnBy])
+  const transposeValueJoinField = useMemo(() => {
+    return exportJoinFields.find((field) => field.path === transposeExport.valueField)
+  }, [exportJoinFields, transposeExport.valueField])
+
+  useEffect(() => {
+    setTransposeExport(defaultTransposeExport)
+  }, [defaultTransposeExport])
 
   useEffect(() => {
     if (!collection) return
@@ -339,6 +368,7 @@ export default function BulkImportExportBeforeListClient(props: { endpointBase?:
         endpointBase,
         joinedFields: selectedExportJoinFields,
         queryString: typeof window === 'undefined' ? '' : window.location.search,
+        transpose: transposeExport,
       })
       setRequestState({
         message: 'CSV export started.',
@@ -510,6 +540,7 @@ export default function BulkImportExportBeforeListClient(props: { endpointBase?:
                           {field.path} · {field.type}
                           {field.hasMany ? '[]' : ''}
                           {field.required ? ' · required' : ''}
+                          {field.requiredOnCreate ? ' · required on create' : ''}
                         </span>
                       </div>
 
@@ -654,6 +685,151 @@ export default function BulkImportExportBeforeListClient(props: { endpointBase?:
               >
                 x
               </button>
+            </div>
+
+            <div className="bulk-upload__export-options">
+              <div className="bulk-upload__export-options-header">
+                <strong>Transpose export</strong>
+                <label className="bulk-upload__switch">
+                  <input
+                    checked={transposeExport.enabled}
+                    disabled={isWorking}
+                    onChange={(event) => {
+                      setTransposeExport((current) => ({
+                        ...current,
+                        enabled: event.target.checked,
+                      }))
+                    }}
+                    type="checkbox"
+                  />
+                  <span>{transposeExport.enabled ? 'Enabled' : 'Disabled'}</span>
+                </label>
+              </div>
+
+              <p className="bulk-upload__helper">
+                Condense repeated records into one row per selected field, then create dynamic
+                columns from another field. For attendance exports, group by user and create columns
+                from meetings.
+              </p>
+
+              <div className="bulk-upload__transpose-grid">
+                <label className="bulk-upload__field">
+                  <span>Group rows by</span>
+                  <select
+                    disabled={isWorking || !transposeExport.enabled}
+                    onChange={(event) => {
+                      setTransposeExport((current) => ({
+                        ...current,
+                        groupBy: event.target.value,
+                      }))
+                    }}
+                    value={transposeExport.groupBy}
+                  >
+                    {exportJoinFields.map((field) => (
+                      <option key={field.path} value={field.path}>
+                        {field.label} ({field.path})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="bulk-upload__field">
+                  <span>Create columns from</span>
+                  <select
+                    disabled={isWorking || !transposeExport.enabled}
+                    onChange={(event) => {
+                      const nextColumnBy = event.target.value
+                      const nextHeaderFields =
+                        exportJoinFields.find((field) => field.path === nextColumnBy)?.fields || []
+
+                      setTransposeExport((current) => ({
+                        ...current,
+                        columnBy: nextColumnBy,
+                        columnHeaderField:
+                          nextHeaderFields.find((field) => field.path === current.columnHeaderField)
+                            ?.path ||
+                          nextHeaderFields.find((field) => field.path === 'id')?.path ||
+                          nextHeaderFields[0]?.path ||
+                          'id',
+                      }))
+                    }}
+                    value={transposeExport.columnBy}
+                  >
+                    {exportJoinFields.map((field) => (
+                      <option key={field.path} value={field.path}>
+                        {field.label} ({field.path})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="bulk-upload__field">
+                  <span>Cell value</span>
+                  <select
+                    disabled={isWorking || !transposeExport.enabled}
+                    onChange={(event) => {
+                      const nextValueField = event.target.value
+                      const nextJoinField = exportJoinFields.find(
+                        (field) => field.path === nextValueField,
+                      )
+
+                      setTransposeExport((current) => ({
+                        ...current,
+                        valueField: nextValueField,
+                      }))
+
+                      if (nextJoinField) {
+                        setSelectedExportJoinFields((current) => ({
+                          ...current,
+                          [nextJoinField.path]:
+                            current[nextJoinField.path] || getDefaultJoinedSubfields(nextJoinField),
+                        }))
+                      }
+                    }}
+                    value={transposeExport.valueField}
+                  >
+                    {exportFieldOptions.map((field) => (
+                      <option key={field.path} value={field.path}>
+                        {field.label} ({field.path})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="bulk-upload__field">
+                  <span>Column header</span>
+                  <select
+                    disabled={isWorking || !transposeExport.enabled}
+                    onChange={(event) => {
+                      setTransposeExport((current) => ({
+                        ...current,
+                        columnHeaderField: event.target.value,
+                      }))
+                    }}
+                    value={transposeExport.columnHeaderField}
+                  >
+                    {transposeColumnHeaderFields.map((field) => (
+                      <option key={field.path} value={field.path}>
+                        {field.label} ({field.path})
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              </div>
+
+              {transposeExport.enabled && selectedExportJoinFields[transposeExport.groupBy] && (
+                <div className="bulk-upload__note">
+                  The selected subfields for {transposeExport.groupBy} will become the leading CSV
+                  columns before the transposed meeting columns.
+                </div>
+              )}
+
+              {transposeExport.enabled && transposeValueJoinField && (
+                <div className="bulk-upload__note">
+                  The selected subfields for {transposeExport.valueField} will expand each dynamic
+                  column as {transposeExport.columnHeaderField || 'header'}.fieldName.
+                </div>
+              )}
             </div>
 
             <div className="bulk-upload__export-options">
@@ -865,12 +1041,14 @@ async function sendBulkExportRequest(args: {
   endpointBase: string
   joinedFields: Record<string, string[]>
   queryString: string
+  transpose: ExportTransposeConfig
 }) {
   const response = await fetch(`${args.api}${args.endpointBase}/export`, {
     body: JSON.stringify({
       collection: args.collection,
       joinedFields: args.joinedFields,
       queryString: args.queryString,
+      transpose: args.transpose,
     }),
     credentials: 'include',
     headers: {
@@ -970,6 +1148,54 @@ function getExportJoinFields(collections: unknown, collectionSlug: string): Expo
   }) as { fields?: unknown[] } | undefined
 
   return collection?.fields ? collectExportJoinFields(collection.fields, collections) : []
+}
+
+function getExportFieldOptions(collections: unknown, collectionSlug: string): ExportJoinSubfield[] {
+  if (!Array.isArray(collections) || !collectionSlug) return []
+
+  const collection = collections.find((item) => {
+    if (!item || typeof item !== 'object') return false
+
+    return (item as Record<string, unknown>).slug === collectionSlug
+  }) as { fields?: unknown[]; timestamps?: boolean } | undefined
+
+  if (!collection) return []
+
+  return [
+    { label: 'ID', path: 'id', type: 'id' },
+    ...collectExportSubfields(collection.fields || []),
+    ...(collection.timestamps === false
+      ? []
+      : [
+          { label: 'Created At', path: 'createdAt', type: 'date' },
+          { label: 'Updated At', path: 'updatedAt', type: 'date' },
+        ]),
+  ]
+}
+
+function getDefaultTransposeConfig(
+  collection: string,
+  joinFields: ExportJoinField[],
+): ExportTransposeConfig {
+  const userField = joinFields.find((field) => field.path === 'user')
+  const meetingField = joinFields.find((field) => field.path === 'meeting')
+  const groupBy = collection === 'attendances' ? userField?.path : joinFields[0]?.path
+  const columnBy =
+    collection === 'attendances'
+      ? meetingField?.path || joinFields.find((field) => field.path !== groupBy)?.path
+      : joinFields.find((field) => field.path !== groupBy)?.path || joinFields[1]?.path
+  const columnHeaderFields = joinFields.find((field) => field.path === columnBy)?.fields || []
+
+  return {
+    columnBy: columnBy || '',
+    columnHeaderField:
+      columnHeaderFields.find((field) => field.path === 'id')?.path ||
+      columnHeaderFields[0]?.path ||
+      'id',
+    enabled: false,
+    groupBy: groupBy || '',
+    valueField: 'createdAt',
+  }
 }
 
 function collectExportJoinFields(

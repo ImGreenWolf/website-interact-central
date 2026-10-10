@@ -28,8 +28,12 @@ import { ReindexButton as ReindexButton_aead06e4cbf6b2620c5c51c9ab283634 } from 
 import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
 import { RowLabel as RowLabel_1f6ff6ff633e3695d348f4f3c58f1466 } from '@/Footer/RowLabel'
-import { default as default_1a7510af427896d367a49dbf838d2de6 } from '@/components/BeforeDashboard'
-import { default as default_8a7ab0eb7ab5c511aba12e68480bfe5e } from '@/components/BeforeLogin'
+import { default as default_fc550f0fdcfc09303a996e7af0dbdb94 } from '@/components/ui/icon'
+import { default as default_5d204472b402252fd483917d5d52cf9b } from '@/components/Dashboard/Widgets/MemberPresenceStatisticsWidget'
+import { default as default_d71f351cd160870b0932074773e53d18 } from '@/components/Dashboard/Widgets/MemberPresenceGraphWidget'
+import { default as default_823522da3cb9619941a09633a30d730b } from '@/components/Dashboard/Widgets/MeetingsManagementWidget'
+import { default as default_4dc482460c863fe080691cd93c951a67 } from '@/components/Dashboard/Widgets/LastMeetingStatisticWidget'
+import { default as default_5e59fe13afdfb1460de5dd051aeb5f46 } from '@/components/Dashboard/Widgets/IntroWidget'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -64,7 +68,11 @@ export const importMap = {
   "@payloadcms/next/client#FolderTypeField": FolderTypeField_2b8867833a34864a02ddf429b0728a40,
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
   "@/Footer/RowLabel#RowLabel": RowLabel_1f6ff6ff633e3695d348f4f3c58f1466,
-  "@/components/BeforeDashboard#default": default_1a7510af427896d367a49dbf838d2de6,
-  "@/components/BeforeLogin#default": default_8a7ab0eb7ab5c511aba12e68480bfe5e,
+  "@/components/ui/icon#default": default_fc550f0fdcfc09303a996e7af0dbdb94,
+  "@/components/Dashboard/Widgets/MemberPresenceStatisticsWidget#default": default_5d204472b402252fd483917d5d52cf9b,
+  "@/components/Dashboard/Widgets/MemberPresenceGraphWidget#default": default_d71f351cd160870b0932074773e53d18,
+  "@/components/Dashboard/Widgets/MeetingsManagementWidget#default": default_823522da3cb9619941a09633a30d730b,
+  "@/components/Dashboard/Widgets/LastMeetingStatisticWidget#default": default_4dc482460c863fe080691cd93c951a67,
+  "@/components/Dashboard/Widgets/IntroWidget#default": default_5e59fe13afdfb1460de5dd051aeb5f46,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

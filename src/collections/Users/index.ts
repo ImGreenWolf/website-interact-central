@@ -39,16 +39,32 @@ export const Users: CollectionConfig = {
       name: 'role',
       type: 'select',
       saveToJWT: true,
-      defaultValue: 'board',
+      defaultValue: 'Președinte',
       options: [
-        'active',
-        'board',
+        'Membru Activ',
+        'Membru Pasiv',
+        'Președinte',
+        'Vicepreședinte',
+        'Secretar',
+        'Trezorier',
+        'PM Director',
+        'PR Director',
+        'IR Director',
+        'HR Director',
+        'Past-President',
+
       ],
       access: {
         create: boardFieldAccess,
         update: boardFieldAccess,
       },
     },
+    {
+      name: 'joinedAt',
+      type: 'date',
+      required: true,
+      defaultValue: new Date()
+    }
   ],
   timestamps: true,
 }

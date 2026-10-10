@@ -1,7 +1,12 @@
 import type { CollectionConfig, Endpoint, PayloadRequest, Sort, Where } from 'payload'
 
 import type { NormalizedBulkImportExportPluginConfig } from '../types'
-import { ExportError, exportCollectionCSV } from './exporter'
+import {
+  ExportError,
+  type ExportCollectionCSVArgs,
+  type ExportTransposeConfig,
+  exportCollectionCSV,
+} from './exporter'
 import {
   type BulkUploadMapping,
   type BulkUploadMode,
@@ -21,26 +26,22 @@ export function createBulkImportExportEndpoints(
 
   return [
     {
-      handler: (req) =>
-        handleBulkUploadRequest(req, collections, options, 'inspect'),
+      handler: (req) => handleBulkUploadRequest(req, collections, options, 'inspect'),
       method: 'post',
       path: `${endpointBase}/inspect`,
     },
     {
-      handler: (req) =>
-        handleBulkUploadRequest(req, collections, options, 'preview'),
+      handler: (req) => handleBulkUploadRequest(req, collections, options, 'preview'),
       method: 'post',
       path: `${endpointBase}/preview`,
     },
     {
-      handler: (req) =>
-        handleBulkUploadRequest(req, collections, options, 'import'),
+      handler: (req) => handleBulkUploadRequest(req, collections, options, 'import'),
       method: 'post',
       path: `${endpointBase}/import`,
     },
     {
-      handler: (req) =>
-        handleBulkUploadRequest(req, collections, options, 'export'),
+      handler: (req) => handleBulkUploadRequest(req, collections, options, 'export'),
       method: 'post',
       path: `${endpointBase}/export`,
     },
@@ -55,23 +56,24 @@ async function handleBulkUploadRequest(
 ) {
   try {
     const input =
-      action === 'export'
-        ? await readExportJSON(req)
-        : await readBulkUploadForm(req, action)
+      action === 'export' ? await readExportJSON(req) : await readBulkUploadForm(req, action)
 
     assertCollectionEnabled(input.collection, options.collections)
 
     if (action === 'export') {
       const exportInput = input as Awaited<ReturnType<typeof readExportJSON>>
-      const csv = await exportCollectionCSV({
+      const exportArgs: ExportCollectionCSVArgs = {
         collectionSlug: exportInput.collection,
         collections,
+        joinedFields: exportInput.joinedFields,
         payload: req.payload,
         queryString: exportInput.queryString,
         req,
         sort: exportInput.sort,
+        transpose: exportInput.transpose,
         where: exportInput.where,
-      })
+      }
+      const csv = await exportCollectionCSV(exportArgs)
 
       return new Response(csv, {
         headers: {
@@ -126,10 +128,7 @@ async function handleBulkUploadRequest(
       `${result.errors.length} errors`,
     ].join(', ')
     const status =
-      result.created.length + result.updated.length === 0 &&
-      result.errors.length > 0
-        ? 400
-        : 200
+      result.created.length + result.updated.length === 0 && result.errors.length > 0 ? 400 : 200
 
     return Response.json({ message, ...result }, { status })
   } catch (error) {
@@ -154,20 +153,14 @@ async function handleBulkUploadRequest(
 
     return Response.json(
       {
-        message:
-          error instanceof Error
-            ? error.message
-            : 'Bulk import/export request failed.',
+        message: error instanceof Error ? error.message : 'Bulk import/export request failed.',
       },
       { status: 500 },
     )
   }
 }
 
-async function readBulkUploadForm(
-  req: PayloadRequest,
-  action: BulkUploadAction,
-) {
+async function readBulkUploadForm(req: PayloadRequest, action: BulkUploadAction) {
   if (!req.user) {
     throw new BulkUploadError('Your session has expired. Sign in again.', 401)
   }
@@ -209,9 +202,7 @@ async function readBulkUploadForm(
     matchColumn: getFormString(formData, 'matchColumn'),
     matchField: getFormString(formData, 'matchField'),
     mode: normalizeMode(getFormString(formData, 'mode')),
-    rowNumbers: normalizeRowNumbers(
-      parseJSONFormValue<unknown[]>(formData, 'rowNumbers', []),
-    ),
+    rowNumbers: normalizeRowNumbers(parseJSONFormValue<unknown[]>(formData, 'rowNumbers', [])),
   }
 }
 
@@ -223,9 +214,7 @@ async function readBulkUploadJSON(req: PayloadRequest, action: BulkUploadAction)
   const data = (await req.json()) as Record<string, unknown>
   const collection = getRecordString(data, 'collection')
   const fileName = getRecordString(data, 'fileName')
-  const csv =
-    decodeBase64CSV(getRecordString(data, 'csvBase64')) ||
-    getRecordString(data, 'csv')
+  const csv = decodeBase64CSV(getRecordString(data, 'csvBase64')) || getRecordString(data, 'csv')
 
   if (!collection) {
     throw new BulkUploadError('Choose a collection.')
@@ -274,8 +263,10 @@ async function readExportJSON(req: PayloadRequest) {
 
   return {
     collection,
+    joinedFields: normalizeJoinedFields(data.joinedFields),
     queryString: getRecordString(data, 'queryString'),
     sort: typeof data.sort === 'string' ? (data.sort as Sort) : undefined,
+    transpose: normalizeTransposeConfig(data.transpose),
     where: getRecordObject<undefined | Where>(data, 'where', undefined),
   }
 }
@@ -305,16 +296,49 @@ function getRecordString(record: Record<string, unknown>, key: string) {
   return typeof value === 'string' ? value : ''
 }
 
-function getRecordObject<TValue>(
-  record: Record<string, unknown>,
-  key: string,
-  fallback: TValue,
-) {
+function getRecordObject<TValue>(record: Record<string, unknown>, key: string, fallback: TValue) {
   const value = record[key]
 
-  return value && typeof value === 'object' && !Array.isArray(value)
-    ? (value as TValue)
-    : fallback
+  return value && typeof value === 'object' && !Array.isArray(value) ? (value as TValue) : fallback
+}
+
+function normalizeJoinedFields(value: unknown) {
+  if (Array.isArray(value)) {
+    return Object.fromEntries(
+      value
+        .filter((item): item is string => typeof item === 'string' && item.length > 0)
+        .map((field) => [field, []]),
+    )
+  }
+
+  if (!value || typeof value !== 'object') return {}
+
+  return Object.fromEntries(
+    Object.entries(value as Record<string, unknown>)
+      .filter(([field]) => field.length > 0)
+      .map(([field, subfields]) => [
+        field,
+        Array.isArray(subfields)
+          ? subfields.filter(
+              (subfield): subfield is string => typeof subfield === 'string' && subfield.length > 0,
+            )
+          : [],
+      ]),
+  )
+}
+
+function normalizeTransposeConfig(value: unknown): ExportTransposeConfig | undefined {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return undefined
+
+  const record = value as Record<string, unknown>
+
+  return {
+    columnBy: typeof record.columnBy === 'string' ? record.columnBy : '',
+    columnHeaderField: typeof record.columnHeaderField === 'string' ? record.columnHeaderField : '',
+    enabled: record.enabled === true,
+    groupBy: typeof record.groupBy === 'string' ? record.groupBy : '',
+    valueField: typeof record.valueField === 'string' ? record.valueField : '',
+  }
 }
 
 function decodeBase64CSV(value: string) {
@@ -337,11 +361,7 @@ function normalizeRowNumbers(value: unknown) {
   return rowNumbers.length > 0 ? rowNumbers : undefined
 }
 
-function parseJSONFormValue<TValue>(
-  formData: FormData,
-  key: string,
-  fallback: TValue,
-) {
+function parseJSONFormValue<TValue>(formData: FormData, key: string, fallback: TValue) {
   const value = getFormString(formData, key)
 
   if (!value) return fallback

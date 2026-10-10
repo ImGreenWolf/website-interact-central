@@ -43,7 +43,7 @@
 }
 
 .bulk-upload--export {
-  width: min(42rem, calc(100vw - 2rem));
+  width: min(52rem, calc(100vw - 2rem));
 }
 
 .bulk-upload__intro {
@@ -214,6 +214,29 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.bulk-upload__helper {
+  margin: 0;
+  color: var(--theme-text-dim);
+  font-size: 0.85rem;
+  line-height: 1.45;
+}
+
+.bulk-upload__switch {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  color: var(--theme-text);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.bulk-upload__transpose-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
   gap: 0.75rem;
 }
 
