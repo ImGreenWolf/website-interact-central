@@ -33,6 +33,9 @@ export default buildConfig({
       graphics: {
         Icon: {
           path: '@/components/ui/icon'
+        },
+        Logo:{
+            path: '@/components/Logo/Logo'
         }
       }
     },

@@ -29,6 +29,7 @@ import { FolderTypeField as FolderTypeField_2b8867833a34864a02ddf429b0728a40 } f
 import { RowLabel as RowLabel_ec255a65fa6fa8d1faeb09cf35284224 } from '@/Header/RowLabel'
 import { RowLabel as RowLabel_1f6ff6ff633e3695d348f4f3c58f1466 } from '@/Footer/RowLabel'
 import { default as default_fc550f0fdcfc09303a996e7af0dbdb94 } from '@/components/ui/icon'
+import { default as default_a0bd5f2fa532ef2166f77171a2b9828a } from '@/components/Logo/Logo'
 import { default as default_5d204472b402252fd483917d5d52cf9b } from '@/components/Dashboard/Widgets/MemberPresenceStatisticsWidget'
 import { default as default_d71f351cd160870b0932074773e53d18 } from '@/components/Dashboard/Widgets/MemberPresenceGraphWidget'
 import { default as default_823522da3cb9619941a09633a30d730b } from '@/components/Dashboard/Widgets/MeetingsManagementWidget'
@@ -69,6 +70,7 @@ export const importMap = {
   "@/Header/RowLabel#RowLabel": RowLabel_ec255a65fa6fa8d1faeb09cf35284224,
   "@/Footer/RowLabel#RowLabel": RowLabel_1f6ff6ff633e3695d348f4f3c58f1466,
   "@/components/ui/icon#default": default_fc550f0fdcfc09303a996e7af0dbdb94,
+  "@/components/Logo/Logo#default": default_a0bd5f2fa532ef2166f77171a2b9828a,
   "@/components/Dashboard/Widgets/MemberPresenceStatisticsWidget#default": default_5d204472b402252fd483917d5d52cf9b,
   "@/components/Dashboard/Widgets/MemberPresenceGraphWidget#default": default_d71f351cd160870b0932074773e53d18,
   "@/components/Dashboard/Widgets/MeetingsManagementWidget#default": default_823522da3cb9619941a09633a30d730b,
