@@ -22,6 +22,7 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
+    "@interact2241/payload-plugin-bulk-import-export": "workspace:*",
     "@payloadcms/admin-bar": "3.90.2",
     "@payloadcms/db-mongodb": "3.90.2",
     "@payloadcms/live-preview-react": "3.90.2",
@@ -29,7 +30,6 @@
     "@payloadcms/plugin-form-builder": "3.90.2",
     "@payloadcms/plugin-nested-docs": "3.90.2",
     "@payloadcms/plugin-redirects": "3.90.2",
-    "@interact2241/payload-plugin-bulk-import-export": "workspace:*",
     "@payloadcms/plugin-search": "3.90.2",
     "@payloadcms/plugin-seo": "3.90.2",
     "@payloadcms/richtext-lexical": "3.90.2",
@@ -38,6 +38,7 @@
     "@radix-ui/react-label": "^2.1.16",
     "@radix-ui/react-select": "^2.3.8",
     "@radix-ui/react-slot": "^1.4.0",
+    "@swc/helpers": "^0.5.23",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cross-env": "^7.0.3",
