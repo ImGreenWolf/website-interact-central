@@ -5,9 +5,6 @@ export default async function secretaryDashboardLayout({
 }: {
   req: PayloadRequest
 }): Promise<Array<WidgetInstance>> {
-
-
-
   return [
     {
       widgetSlug: 'member-presence-graph',
@@ -23,10 +20,6 @@ export default async function secretaryDashboardLayout({
     },
     {
       widgetSlug: 'last-meeting-statistic',
-      width: 'medium',
-    },
-    {
-      widgetSlug: 'event-statistics',
       width: 'medium',
     },
   ]

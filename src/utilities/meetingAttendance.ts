@@ -3,13 +3,10 @@ import type { Payload } from 'payload'
 import type { Attendance, Meeting, User } from '@/payload-types'
 import { canCalculateMeetingAbsences } from '@/utilities/meetingTime'
 
-export const meetingAttendanceMemberRoles = ['active']
+export const meetingAttendanceMemberRoles = ['Membru Activ'] satisfies NonNullable<User['role']>[]
 
 type MeetingAttendanceRecord = Pick<Attendance, 'user'>
-type MeetingWithTiming = Pick<
-  Meeting,
-  'id' | 'meetingDate'
->
+type MeetingWithTiming = Pick<Meeting, 'id' | 'meetingDate'>
 type MeetingMember = Pick<User, 'id' | 'joinedAt'>
 
 export type MeetingMemberAttendance = {
@@ -28,8 +25,6 @@ export function isMemberEligibleForMeeting(
   return new Date(member.joinedAt).getTime() <= new Date(meeting.meetingDate).getTime()
 }
 
-
-
 export function calculateMeetingMemberAttendance(args: {
   attendance: MeetingAttendanceRecord[]
   meeting: MeetingWithTiming
@@ -44,12 +39,11 @@ export function calculateMeetingMemberAttendance(args: {
     attendance.map((record) => [getRelationId(record.user), 'present']),
   )
 
-
   return members
     .filter((member) => isMemberEligibleForMeeting(member, meeting))
     .map((member) => ({
       memberId: member.id,
-      status: 'present'
+      status: attendanceByMember.has(member.id) ? 'present' : 'absent',
     }))
 }
 
@@ -94,7 +88,6 @@ export async function getMeetingAbsenteeIds(
         },
       },
     }),
-
   ])
 
   return calculateMeetingAbsenteeIds({

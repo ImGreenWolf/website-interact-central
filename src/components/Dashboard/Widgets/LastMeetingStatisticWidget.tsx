@@ -31,15 +31,13 @@ export default async function LastMeetingStatisticWidget({ req }: WidgetServerPr
             <StatItem label="Rata prezenței" value={`${lastMeeting.rate}%`} />
             <StatItem
               label="Participanți"
-              value={`${formatNumber(lastMeeting.present + lastMeeting.late)} / ${formatNumber(lastMeeting.total)}`}
+              value={`${formatNumber(lastMeeting.present)} / ${formatNumber(lastMeeting.total)}`}
             />
           </StatGrid>
           <ProgressBar label={lastMeeting.label} value={lastMeeting.rate} />
           <BreakdownList
             items={[
               { label: 'Prezenți', tone: 'success', value: lastMeeting.present },
-              { label: 'Întârziați', tone: 'warning', value: lastMeeting.late },
-              { label: 'Motivați', value: lastMeeting.motivated },
               { label: 'Absenți', tone: 'danger', value: lastMeeting.absent },
             ]}
           />

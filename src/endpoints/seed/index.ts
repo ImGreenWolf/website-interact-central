@@ -104,6 +104,7 @@ export const seed = async ({
       data: {
         name: 'Demo Author',
         email: 'demo-author@example.com',
+        joinedAt: new Date().toISOString(),
         password: 'password',
       },
     }),

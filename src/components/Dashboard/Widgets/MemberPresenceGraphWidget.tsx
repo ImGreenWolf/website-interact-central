@@ -19,7 +19,7 @@ export default async function MemberPresenceGraphWidget({ req }: WidgetServerPro
     >
       <BarGraph
         bars={points.map((point) => ({
-          helper: `${formatNumber(point.present + point.late)}/${formatNumber(point.total)}`,
+          helper: `${formatNumber(point.present)}/${formatNumber(point.total)}`,
           label: point.label,
           value: point.rate,
         }))}
@@ -33,7 +33,7 @@ export default async function MemberPresenceGraphWidget({ req }: WidgetServerPro
           .map((point) => ({
             href: `/admin/collections/meetings/${point.id}`,
             label: point.label,
-            meta: `${formatNumber(point.present + point.late)} prezenți, ${formatNumber(point.absent)} absenți`,
+            meta: `${formatNumber(point.present)} prezenți, ${formatNumber(point.absent)} absenți`,
             value: `${point.rate}%`,
           }))}
       />

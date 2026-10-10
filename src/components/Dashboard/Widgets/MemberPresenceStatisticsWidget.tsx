@@ -12,7 +12,7 @@ export default async function MemberPresenceStatisticsWidget({ req }: WidgetServ
 
   return (
     <WidgetCard
-      actionHref="/admin/collections/attendance"
+      actionHref="/admin/collections/attendances"
       actionLabel="Prezență"
       eyebrow={formatRotaryYearLabel(getRotaryYearStart(now))}
       title="Statistici prezență membri"
@@ -32,8 +32,6 @@ export default async function MemberPresenceStatisticsWidget({ req }: WidgetServ
       <BreakdownList
         items={[
           { label: 'Prezenți', tone: 'success', value: overview.present },
-          { label: 'Întârziați', tone: 'warning', value: overview.late },
-          { label: 'Absențe motivate', value: overview.motivated },
           { label: 'Absenți', tone: 'danger', value: overview.absent },
         ]}
       />

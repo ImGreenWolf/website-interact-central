@@ -5,21 +5,14 @@ export default async function treasurerDashboardLayout({
 }: {
   req: PayloadRequest
 }): Promise<Array<WidgetInstance>> {
-
-
-
   return [
-    {
-      widgetSlug: 'dues-statistics',
-      width: 'medium',
-    },
     {
       widgetSlug: 'member-presence-statistics',
       width: 'medium',
     },
     {
-      widgetSlug: 'dues-management',
-      width: 'full',
+      widgetSlug: 'last-meeting-statistic',
+      width: 'medium',
     },
   ]
 }

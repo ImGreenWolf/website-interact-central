@@ -57,14 +57,14 @@ export default async function MeetingsManagementWidget({ req }: WidgetServerProp
             meta: 'Înregistrare nouă',
           },
           {
-            href: '/admin/collections/attendance/create',
+            href: '/admin/collections/attendances/create',
             label: 'Adaugă prezență',
             meta: 'Status membri',
           },
           {
-            href: '/admin/collections/absence-motivations',
-            label: 'Verifică motivări',
-            meta: 'Cereri',
+            href: '/admin/collections/attendances',
+            label: 'Vezi prezențe',
+            meta: 'Înregistrări',
           },
         ]}
       />
