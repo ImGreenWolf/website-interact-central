@@ -7,7 +7,9 @@ import {
   lexicalEditor,
   UnderlineFeature,
   type LinkFields,
+  BlocksFeature,
 } from '@payloadcms/richtext-lexical'
+import { MediaBlock } from '@/blocks/MediaBlock/config'
 
 export const defaultLexical = lexicalEditor({
   features: [
@@ -15,6 +17,9 @@ export const defaultLexical = lexicalEditor({
     UnderlineFeature(),
     BoldFeature(),
     ItalicFeature(),
+    BlocksFeature({
+      blocks: [MediaBlock]
+    }),
     LinkFeature({
       enabledCollections: ['pages', 'posts'],
       fields: ({ defaultFields }) => {
