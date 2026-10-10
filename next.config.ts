@@ -46,7 +46,7 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   redirects,
-  output: 'standalone',
+  // output: 'standalone',
   outputFileTracingIncludes: {
     '/*': [
       './node_modules/@swc/helpers/**/*',
