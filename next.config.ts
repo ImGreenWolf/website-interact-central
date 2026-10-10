@@ -47,6 +47,11 @@ const nextConfig: NextConfig = {
   reactStrictMode: true,
   redirects,
   output: 'standalone',
+  outputFileTracingIncludes: {
+  '/**/*': [
+    './node_modules/.pnpm/@swc+helpers@*/node_modules/@swc/helpers/esm/**',
+  ],
+},
   turbopack: {
     root: path.resolve(dirname),
   },
