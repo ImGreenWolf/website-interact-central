@@ -48,10 +48,10 @@ const nextConfig: NextConfig = {
   redirects,
   output: 'standalone',
   outputFileTracingIncludes: {
-  '/**/*': [
-    './node_modules/.pnpm/@swc+helpers@*/node_modules/@swc/helpers/esm/**',
-  ],
-},
+    '/*': [
+      './node_modules/@swc/helpers/**/*',
+    ],
+  },
   turbopack: {
     root: path.resolve(dirname),
   },
