@@ -46,10 +46,12 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: true,
   redirects,
-  // output: 'standalone',
+  output: 'standalone',
   outputFileTracingIncludes: {
     '/*': [
       './node_modules/@swc/helpers/**/*',
+      './node_modules/react/**/*',
+      './node_modules/react-dom/**/*',
     ],
   },
   turbopack: {
